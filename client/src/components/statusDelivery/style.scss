@@ -1,0 +1,23 @@
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    padding-bottom: 2px;
+
+    &__link {
+        padding-right: 10px;
+        display: block;
+        cursor: pointer;
+        color: #3899ec;
+        font-weight: 500;
+        font-size: 12px;
+    }
+}
+
+img {
+    background-size: cover;
+    width: 24px;
+    height: 24px;
+    align-self: center;
+}

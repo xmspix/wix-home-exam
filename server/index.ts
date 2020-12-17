@@ -18,9 +18,30 @@ app.use((_, res, next) => {
 });
 
 app.get('/api/orders', (req, res) => {
+	const search = <string>req.query.search;
+	const fulfillment = <string>req.query.fulfillment;
+	const payment = <string>req.query.payment;
 	const page = <number>(req.query.page || 1);
-	const orders: any[] = allOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-	res.send(orders);
+	// const orders: any[] = allOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+	
+	const combinedData = allOrders.map(order => ({ 
+		...order, 
+		items: order.items.map((items: any) => ({
+				...items, 
+				...products[items.id]
+		}))
+	}))
+	.filter((order) => fulfillment ? order.fulfillmentStatus.toLowerCase() === fulfillment : order)
+	.filter((order) => payment ? order.billingInfo.status.toLowerCase() === payment : order)
+	.filter((order) => 
+		order.customer.name.toLowerCase().includes(search.toLowerCase())
+		|| order.items.find((item: any) => item.name.toLowerCase().includes(search.toLowerCase())))		
+			
+	res.send({
+		totalPages: Math.ceil(combinedData.length / PAGE_SIZE), 
+		totalResults: combinedData.length,
+		orders: combinedData.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+	});
 });
 
 app.get('/api/items/:itemId', (req, res) => {
